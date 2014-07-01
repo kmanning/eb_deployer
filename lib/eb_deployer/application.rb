@@ -34,9 +34,9 @@ module EbDeployer
       end
     end
 
-    def delete(env_name_prefix)
+    def delete(env_name_prefix, inactive_only = false)
       if @eb_driver.application_exists?(@name)
-        available_envs = @eb_driver.environment_names_for_application(@name).select do |name|
+        available_envs = @eb_driver.environment_names_for_application(@name, inactive_only).select do |name|
           name =~ /^#{env_name_prefix}-/
         end
 

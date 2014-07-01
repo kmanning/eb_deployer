@@ -192,7 +192,7 @@ class EBStub
     @envs[env_key(app_name, env_name)][:settings]
   end
 
-  def environment_names_for_application(app)
+  def environment_names_for_application(app, inactive_only=false)
     @envs.inject([]) do |memo, pair|
       key, env = pair
       memo << env[:name] if env[:application] == app

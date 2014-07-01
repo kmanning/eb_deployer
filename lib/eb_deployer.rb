@@ -218,7 +218,7 @@ module EbDeployer
     s3 = opts[:s3_driver] || AWSDriver::S3Driver.new
     cf = opts[:cf_driver] || AWSDriver::CloudFormationDriver.new
 
-    Application.new(app, bs, s3).delete(opts[:environment])
+    Application.new(app, bs, s3).delete(opts[:environment], opts[:inactive_only])
   end
 
   def self.cli
@@ -269,6 +269,10 @@ module EbDeployer
 
       opts.on("-d", "--destroy", "Destroy all Elasticbeanstalk environments under the application which have specified environment as name prefix") do |v|
         options[:action] = :destroy
+      end
+
+      opts.on("-i", "--inactive-only", "Use with --destroy flag, to only destroy the inactive stack") do |v|
+        options[:inactive_only] = true
       end
 
       opts.on("--skip-resource-stack-update", "Skip cloud-formation stack update. (only for extreme situation like hitting a cloudformation bug)") do |v|
