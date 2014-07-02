@@ -36,18 +36,18 @@ module EbDeployer
 
     def delete(env_name_prefix, inactive_only = false)
       if @eb_driver.application_exists?(@name)
-        available_envs = @eb_driver.environment_names_for_application(@name, inactive_only).select do |name|
-          name =~ /^#{env_name_prefix}-/
-        end
+        envs = @eb_driver.environments_for_application(@name)
+        envs = envs.select { |env| env[:environment_name] =~ /^#{env_name_prefix}-/ }
+        envs = envs.select { |env| env[:cname] =~ /.+\-inactive\.elasticbeanstalk\.com$/ } if inactive_only
 
-        if available_envs.empty?
+        if envs.empty?
           log("Environment #{env_name_prefix.inspect} does not exist in application #{@name.inspect}. Skipping delete.")
           return
         end
 
-        available_envs.each do |env|
-          log("Terminating environment #{env}")
-          @eb_driver.delete_environment(@name, env)
+        envs.each do |env|
+          log("Terminating environment #{env[:environment_name]}")
+          env.terminate
         end
       end
     end

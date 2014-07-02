@@ -36,10 +36,8 @@ module EbDeployer
         alive_envs(app_name, [env_name]).any?
       end
 
-      def environment_names_for_application(app_name, inactive_only = false)
-        environments = alive_envs(app_name)
-        environments = environments.select { |env| env[:cname] =~ /.+\-inactive\.elasticbeanstalk\.com$/ } if inactive_only
-        environments.collect { |env| env[:environment_name] }
+      def environments_for_application(app_name)
+        alive_envs(app_name)
       end
 
       def create_environment(app_name, env_name, stack_name, cname_prefix, version, tier, tags, settings)

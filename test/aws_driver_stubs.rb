@@ -15,7 +15,7 @@ class EBStub
   end
 
   def delete_application(app)
-    raise "there are environments running for this app" unless environment_names_for_application(app).empty?
+    raise "there are environments running for this app" unless environments_for_application(app).empty?
     @apps.delete(app)
   end
 
@@ -28,7 +28,7 @@ class EBStub
     raise "env name #{env} is longer than 23 chars" if env.size > 23
     raise "app not exists" unless application_exists?(app)
     @envs[env_key(app, env)] = {
-      :name => env,
+      :environment_name => env,
       :application => app,
       :solution_stack => solution_stack,
       :version => version,
@@ -173,7 +173,7 @@ class EBStub
 
   #test only
   def mark_all_envs_ready
-    @envs.values.each { |env| set_env_ready(env[:application], env[:name], true) }
+    @envs.values.each { |env| set_env_ready(env[:application], env[:environment_name], true) }
   end
 
   def set_solution_stacks(names)
@@ -192,12 +192,9 @@ class EBStub
     @envs[env_key(app_name, env_name)][:settings]
   end
 
-  def environment_names_for_application(app, inactive_only=false)
-    @envs.inject([]) do |memo, pair|
-      key, env = pair
-      memo << env[:name] if env[:application] == app
-      memo
-    end
+  def environments_for_application(app, inactive_only=false)
+    environments = @envs.collect { |env_key, env| env }
+    environments.select { |env| env[:application] == app }
   end
 
   def environments_been_deleted(app)
